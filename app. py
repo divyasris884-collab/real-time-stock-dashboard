@@ -1,0 +1,37 @@
+
+import streamlit as st
+import yfinance as yf
+
+st.set_page_config(
+    page_title="Stock Market Dashboard",
+    page_icon="📈",
+    layout="wide"
+)
+
+st.title("📈 Real-Time Stock Market Dashboard")
+st.write("View stock prices and market charts.")
+
+symbol = st.text_input(
+    "Enter Stock Symbol",
+    value="AAPL"
+).upper()
+
+if st.button("Get Stock Data"):
+    with st.spinner("Loading stock data..."):
+        try:
+            stock = yf.Ticker(symbol)
+            data = stock.history(period="1mo")
+
+            if data.empty:
+                st.error("No data found. Check the stock symbol.")
+            else:
+                st.subheader(f"Stock Price: {symbol}")
+                st.metric(
+                    "Latest Closing Price",
+                    f"{data['Close'].iloc[-1]:.2f}"
+                )
+                st.line_chart(data["Close"])
+                st.success("Stock data loaded successfully!")
+
+        except Exception as e:
+            st.error(f"Unable to load stock data: {e}")
